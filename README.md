@@ -1,5 +1,7 @@
 # Medicare Data Analysis
 
+https://public.tableau.com/app/profile/chung.hsi.shan/vizzes
+
 ## Table of Contents
 1. [Introduction](#introduction)
 2. [Tools Used](#tools-used)
@@ -13,8 +15,7 @@ This repository contains SQL scripts and analysis for Medicare data to explore h
 
 ## Tools Used
 - **PostgreSQL**: Used for all data handling, cleaning, and analysis.
-- **SQL**: Structured Query Language for data manipulation and retrieval.
-- **GitHub**: Version control and collaboration.
+- **Tableau**: Dashboard creation and data visualization. 
 
 ## Data Cleaning and Preparation
 The data cleaning process involves several steps to ensure the dataset's quality and usability:
@@ -55,7 +56,7 @@ WHERE Rndrng_NPI IS NULL
     OR Avg_Mdcr_Pymt_Amt IS NULL
     OR Avg_Mdcr_Stdzd_Amt IS NULL;
 
--- Validate data
+-- Validate data to ensure data fits within constraints 
 SELECT *
 FROM public.medicare_data
 WHERE Tot_Benes < 0
@@ -66,70 +67,48 @@ WHERE Tot_Benes < 0
     OR Avg_Mdcr_Pymt_Amt < 0
     OR Avg_Mdcr_Stdzd_Amt < 0;
 
--- Outlier Detection
-WITH iqr_calculations AS (
-    SELECT 
-        percentile_cont(0.25) WITHIN GROUP (ORDER BY Tot_Benes) AS Q1_Tot_Benes,
-        percentile_cont(0.75) WITHIN GROUP (ORDER BY Tot_Benes) AS Q3_Tot_Benes,
-        percentile_cont(0.25) WITHIN GROUP (ORDER BY Tot_Srvcs) AS Q1_Tot_Srvcs,
-        percentile_cont(0.75) WITHIN GROUP (ORDER BY Tot_Srvcs) AS Q3_Tot_Srvcs,
-        percentile_cont(0.25) WITHIN GROUP (ORDER BY Tot_Bene_Day_Srvcs) AS Q1_Tot_Bene_Day_Srvcs,
-        percentile_cont(0.75) WITHIN GROUP (ORDER BY Tot_Bene_Day_Srvcs) AS Q3_Tot_Bene_Day_Srvcs,
-        percentile_cont(0.25) WITHIN GROUP (ORDER BY Avg_Sbmtd_Chrg) AS Q1_Avg_Sbmtd_Chrg,
-        percentile_cont(0.75) WITHIN GROUP (ORDER BY Avg_Sbmtd_Chrg) AS Q3_Avg_Sbmtd_Chrg,
-        percentile_cont(0.25) WITHIN GROUP (ORDER BY Avg_Mdcr_Alowd_Amt) AS Q1_Avg_Mdcr_Alowd_Amt,
-        percentile_cont(0.75) WITHIN GROUP (ORDER BY Avg_Mdcr_Alowd_Amt) AS Q3_Avg_Mdcr_Alowd_Amt,
-        percentile_cont(0.25) WITHIN GROUP (ORDER BY Avg_Mdcr_Pymt_Amt) AS Q1_Avg_Mdcr_Pymt_Amt,
-        percentile_cont(0.75) WITHIN GROUP (ORDER BY Avg_Mdcr_Pymt_Amt) AS Q3_Avg_Mdcr_Pymt_Amt,
-        percentile_cont(0.25) WITHIN GROUP (ORDER BY Avg_Mdcr_Stdzd_Amt) AS Q1_Avg_Mdcr_Stdzd_Amt,
-        percentile_cont(0.75) WITHIN GROUP (ORDER BY Avg_Mdcr_Stdzd_Amt) AS Q3_Avg_Mdcr_Stdzd_Amt
-    FROM public.medicare_data
+-- Outlier detection
+WITH q1_q3 as (
+	SELECT 
+        -- Calculating Q1 (25th percentile) and Q3 (75th percentile) for each column
+		hcpcs_cd,
+        percentile_cont(0.25) WITHIN GROUP (ORDER BY avg_mdcr_stdzd_amt) AS Q1_avg_mdcr_stdzd_amt,
+        percentile_cont(0.75) WITHIN GROUP (ORDER BY avg_mdcr_stdzd_amt) AS Q3_avg_mdcr_stdzd_amt
+	FROM public.medicare_data
+	GROUP BY hcpcs_cd
+),
+iqr_table as (
+	SELECT 
+		hcpcs_cd,
+		Q3_avg_mdcr_stdzd_amt,
+		Q1_avg_mdcr_stdzd_amt,
+		Q3_Avg_Mdcr_Stdzd_Amt - Q1_Avg_Mdcr_Stdzd_Amt as iqr
+	FROM q1_q3
+),
+outliers_table as (
+	SELECT 
+		df.*,
+		i.Q3_avg_mdcr_stdzd_amt,
+		i.Q1_avg_mdcr_stdzd_amt,
+		i.Q3_Avg_Mdcr_Stdzd_Amt - Q1_Avg_Mdcr_Stdzd_Amt as iqr,
+		CASE 
+	        WHEN df.Avg_Mdcr_Stdzd_Amt < i.Q1_Avg_Mdcr_Stdzd_Amt - 1.5 * (i.Q3_Avg_Mdcr_Stdzd_Amt - i.Q1_Avg_Mdcr_Stdzd_Amt) OR 
+	             df.Avg_Mdcr_Stdzd_Amt > i.Q3_Avg_Mdcr_Stdzd_Amt + 1.5 * (i.Q3_Avg_Mdcr_Stdzd_Amt - i.Q1_Avg_Mdcr_Stdzd_Amt) THEN 1
+	        ELSE 0
+	    END AS Avg_Mdcr_Stdzd_Amt_Outlier
+	FROM public.medicare_data as df
+		LEFT JOIN iqr_table as i
+			ON df.hcpcs_cd = i.hcpcs_cd
 )
+
 SELECT 
-    t.*, 
-    Q3_Tot_Benes - Q1_Tot_Benes AS IQR_Tot_Benes,
-    Q3_Tot_Srvcs - Q1_Tot_Srvcs AS IQR_Tot_Srvcs,
-    Q3_Tot_Bene_Day_Srvcs - Q1_Tot_Bene_Day_Srvcs AS IQR_Tot_Bene_Day_Srvcs,
-    Q3_Avg_Sbmtd_Chrg - Q1_Avg_Sbmtd_Chrg AS IQR_Avg_Sbmtd_Chrg,
-    Q3_Avg_Mdcr_Alowd_Amt - Q1_Avg_Mdcr_Alowd_Amt AS IQR_Avg_Mdcr_Alowd_Amt,
-    Q3_Avg_Mdcr_Pymt_Amt - Q1_Avg_Mdcr_Pymt_Amt AS IQR_Avg_Mdcr_Pymt_Amt,
-    Q3_Avg_Mdcr_Stdzd_Amt - Q1_Avg_Mdcr_Stdzd_Amt AS IQR_Avg_Mdcr_Stdzd_Amt,
-    CASE 
-        WHEN t.Tot_Benes < Q1_Tot_Benes - 1.5 * (Q3_Tot_Benes - Q1_Tot_Benes) OR 
-             t.Tot_Benes > Q3_Tot_Benes + 1.5 * (Q3_Tot_Benes - Q1_Tot_Benes) THEN 'Outlier'
-        ELSE 'Normal' 
-    END AS Tot_Benes_Outlier,
-    CASE 
-        WHEN t.Tot_Srvcs < Q1_Tot_Srvcs - 1.5 * (Q3_Tot_Srvcs - Q1_Tot_Srvcs) OR 
-             t.Tot_Srvcs > Q3_Tot_Srvcs + 1.5 * (Q3_Tot_Srvcs - Q1_Tot_Srvcs) THEN 'Outlier'
-        ELSE 'Normal' 
-    END AS Tot_Srvcs_Outlier,
-    CASE 
-        WHEN t.Tot_Bene_Day_Srvcs < Q1_Tot_Bene_Day_Srvcs - 1.5 * (Q3_Tot_Bene_Day_Srvcs - Q1_Tot_Bene_Day_Srvcs) OR 
-             t.Tot_Bene_Day_Srvcs > Q3_Tot_Bene_Day_Srvcs + 1.5 * (Q3_Tot_Bene_Day_Srvcs - Q1_Tot_Bene_Day_Srvcs) THEN 'Outlier'
-        ELSE 'Normal' 
-    END AS Tot_Bene_Day_Srvcs_Outlier,
-    CASE 
-        WHEN t.Avg_Sbmtd_Chrg < Q1_Avg_Sbmtd_Chrg - 1.5 * (Q3_Avg_Sbmtd_Chrg - Q1_Avg_Sbmtd_Chrg) OR 
-             t.Avg_Sbmtd_Chrg > Q3_Avg_Sbmtd_Chrg + 1.5 * (Q3_Avg_Sbmtd_Chrg - Q1_Avg_Sbmtd_Chrg) THEN 'Outlier'
-        ELSE 'Normal' 
-    END AS Avg_Sbmtd_Chrg_Outlier,
-    CASE 
-        WHEN t.Avg_Mdcr_Alowd_Amt < Q1_Avg_Mdcr_Alowd_Amt - 1.5 * (Q3_Avg_Mdcr_Alowd_Amt - Q1_Avg_Mdcr_Alowd_Amt) OR 
-             t.Avg_Mdcr_Alowd_Amt > Q3_Avg_Mdcr_Alowd_Amt + 1.5 * (Q3_Avg_Mdcr_Alowd_Amt - Q1_Avg_Mdcr_Alowd_Amt) THEN 'Outlier'
-        ELSE 'Normal' 
-    END AS Avg_Mdcr_Alowd_Amt_Outlier,
-    CASE 
-        WHEN t.Avg_Mdcr_Pymt_Amt < Q1_Avg_Mdcr_Pymt_Amt - 1.5 * (Q3_Avg_Mdcr_Pymt_Amt - Q1_Avg_Mdcr_Pymt_Amt) OR 
-             t.Avg_Mdcr_Pymt_Amt > Q3_Avg_Mdcr_Pymt_Amt + 1.5 * (Q3_Avg_Mdcr_Pymt_Amt - Q1_Avg_Mdcr_Pymt_Amt) THEN 'Outlier'
-        ELSE 'Normal' 
-    END AS Avg_Mdcr_Pymt_Amt_Outlier,
-    CASE 
-        WHEN t.Avg_Mdcr_Stdzd_Amt < Q1_Avg_Mdcr_Stdzd_Amt - 1.5 * (Q3_Avg_Mdcr_Stdzd_Amt - Q1_Avg_Mdcr_Stdzd_Amt) OR 
-             t.Avg_Mdcr_Stdzd_Amt > Q3_Avg_Mdcr_Stdzd_Amt + 1.5 * (Q3_Avg_Mdcr_Stdzd_Amt - Q1_Avg_Mdcr_Stdzd_Amt) THEN 'Outlier'
-        ELSE 'Normal' 
-    END AS Avg_Mdcr_Stdzd_Amt_Outlier
-FROM public.medicare_data t, iqr_calculations;
+	hcpcs_cd，
+	SUM(Avg_Mdcr_Stdzd_Amt_Outlier) as sum_outliers,
+	COUNT(*) AS total_count,
+	ROUND(SUM(Avg_Mdcr_Stdzd_Amt_Outlier) / CAST(COUNT(*) AS FLOAT)::numeric, 2) AS rounded_outlier_percentage
+FROM outliers_table
+GROUP BY hcpcs_cd
+ORDER BY rounded_outlier_percentage DESC;
 ```
 
 ## Exploratory Data Analysis (EDA)
