@@ -133,7 +133,14 @@ FROM spent_each_code
 GROUP BY hcpcs_cd
 ORDER BY total_paid DESC;
 
--- Analyzing the percentage of outliers for each HCPCS code based on the Average Medicare Standardized Payment Amount. This field standardizes payments by removing geographic differences, such as local wages or input prices, making Medicare payments comparable across different areas. This allows us to see variations that reflect differences in factors like physicians' practice patterns and beneficiaries' access to and desire for care. By filtering for HCPCS codes with more than 100 entries, this eliminates the HCPCS codes that can be easily influenced by extreme values due to their small sample sizes. 
+/* Analyzing the percentage of outliers for each HCPCS code based on the Average
+Medicare Standardized Payment Amount. This field standardizes payments by removing
+geographic differences, such as local wages or input prices, making Medicare payments
+comparable across different areas. This allows us to see variations that reflect
+differences in factors like physicians' practice patterns and beneficiaries' access to
+and desire for care. By filtering for HCPCS codes with more than 100 entries, this
+eliminates the HCPCS codes that can be easily influenced by extreme values due to
+their small sample sizes */
 
 WITH q1_q3 as (
 	SELECT 
@@ -204,8 +211,8 @@ ranking_table AS (
         DENSE_RANK() OVER(PARTITION BY df.rndrng_prvdr_type, df.rndrng_prvdr_state_abrvtn ORDER BY total_claim DESC) AS ranking
     FROM public.medicare_data AS df
     LEFT JOIN cte2 ON cte2.rndrng_npi = df.rndrng_npi 
-    AND cte2.rndrng_prvdr_type = df.rndrng_prvdr_type
-    AND cte2.rndrng_prvdr_state_abrvtn = df.rndrng_prvdr_state_abrvtn
+        AND cte2.rndrng_prvdr_type = df.rndrng_prvdr_type
+        AND cte2.rndrng_prvdr_state_abrvtn = df.rndrng_prvdr_state_abrvtn
     ORDER BY ranking
 )
 SELECT DISTINCT
