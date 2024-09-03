@@ -111,6 +111,12 @@ ORDER BY COUNT (DISTINCT rndrng_npi) DESC;
 
 -- 2. Service Type Analysis
 
+-- Calculate how many distinct HSPCS code there are, there are a total of 6326 unique HSPCS code in total. 
+
+SELECT
+    COUNT (DISTINCT hcpcs_cd)
+FROM public.medicare_data
+
 -- Calculate how much Medicare spent for each HSPCS code in 2022
 
 With spent_each_code AS (
@@ -127,7 +133,7 @@ FROM spent_each_code
 GROUP BY hcpcs_cd
 ORDER BY total_paid DESC;
 
--- Understanding the percentage of outliers for each HSPCS code based on the Average Medicare Standardized Payment Amount field ( Standardization removes geographic differences in payment rates for individual services, such as those that account for local wages or input prices and makes Medicare payments across geographic areas comparable, so that differences reflect variation in factors such as physicians’ practice patterns and beneficiaries’ ability and willingness to obtain care).
+-- Analyzing the percentage of outliers for each HCPCS code based on the Average Medicare Standardized Payment Amount. This field standardizes payments by removing geographic differences, such as local wages or input prices, making Medicare payments comparable across different areas. This allows us to see variations that reflect differences in factors like physicians' practice patterns and beneficiaries' access to and desire for care. By filtering for HCPCS codes with more than 100 entries, this eliminates the HCPCS codes that can be easily influenced by extreme values due to their small sample sizes. 
 
 WITH q1_q3 as (
 	SELECT 
@@ -169,6 +175,7 @@ SELECT
 	ROUND(SUM(Avg_Mdcr_Stdzd_Amt_Outlier) / CAST(COUNT(*) AS FLOAT)::numeric, 2) AS rounded_outlier_percentage
 FROM outliers_table
 GROUP BY hcpcs_cd
+HAVING COUNT(*)>100
 ORDER BY rounded_outlier_percentage DESC;
 
 -- Ranking Analysis
