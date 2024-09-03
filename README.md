@@ -185,7 +185,10 @@ GROUP BY hcpcs_cd
 HAVING COUNT(*)>100
 ORDER BY rounded_outlier_percentage DESC;
 
--- Ranking Analysis
+-- 3. Ranking Analysis
+
+-- The following ranks NPIs according to their service type and state, based on the total claim amount for the year 2022.
+
 WITH table_total_amt AS (
     SELECT 
         rndrng_npi,
@@ -226,10 +229,8 @@ SELECT DISTINCT
     total_claim,
     ranking
 FROM ranking_table
-WHERE ranking <= 10
-    AND rndrng_prvdr_state_abrvtn != 'AA'
+WHERE rndrng_prvdr_state_abrvtn != 'AA'
     AND rndrng_prvdr_state_abrvtn != 'AE'
 ORDER BY rndrng_prvdr_state_abrvtn, rndrng_prvdr_type, ranking;
-
 
 ```
