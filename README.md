@@ -9,7 +9,10 @@
 6. [Limitations](#limitations)
 
 ## Introduction
-This repository contains SQL scripts and analysis for Medicare data to explore healthcare provider behavior and trends. The primary objectives include data cleaning, handling missing values, identifying outliers, and performing exploratory data analysis to derive actionable insights.
+The idea for this project is inspired by my work in rare disease marketing at Sanofi, where navigating a complex diagnostic landscape was a significant challenge. Understanding the distribution and behavior of healthcare providers is crucial for optimizing resource allocation, especially in areas with limited patient populations and specialized needs. This dashboard addresses these challenges by presenting a clear, data-driven picture of provider activity and influence across various regions and specialties.
+
+This repository contains SQL scripts and analysis for Medicare data to explore healthcare provider behavior and trends. The primary objectives include data cleaning, handling missing values, identifying outliers, performing exploratory data analysis, and using the data to create a user-friendly dashboard to understand healthcare spending across different provider types and individual HCPs. The dashboard is designed to support  decision-makers by offering insights into provider behaviors, enabling more informed decision-making for resource allocation and strategic planning.
+
 **Link to dashboard**: https://public.tableau.com/app/profile/chung.hsi.shan/vizzes
 
 ## Tools Used and Dashboard Preview
@@ -263,7 +266,10 @@ WHERE
     rndrng_prvdr_type = 'Pediatric Medicine';
 ```
 ## Results and Recommendations
-
+- **Resource Allocation**: By understanding where KOLs are located and how they influence the healthcare landscape, organizations can more effectively allocate resources, target outreach efforts, and design educational programs.
+- **Market Analysis and Strategy**: The insights derived from this data analysis can help inform market strategies, identify unmet needs, and guide product development and distribution plans.
+- **Improving Patient Outcomes**: By identifying trends in healthcare provider behavior, stakeholders can implement strategies to improve patient outcomes, particularly in underserved or high-need areas.
+- **Policy Development**: Policy makers can use the data to understand healthcare utilization patterns and develop policies that address gaps in care or inequities in service provision.
 
 ## Limitations
 - Only Medicare Part B (Outpatient Services) non-institutional claims (excluding
