@@ -1,10 +1,10 @@
-# Medicare Data Analysis
+# Medicare Data Analysis and Dashboard
 
 https://public.tableau.com/app/profile/chung.hsi.shan/vizzes
 
 ## Table of Contents
 1. [Introduction](#introduction)
-2. [Tools Used](#tools-used)
+2. [Tools Used and Dashboard Preview](#tools-used-and-dashboard-preview)
 3. [Data Cleaning and Preparation](#data-cleaning-and-preparation)
 4. [Exploratory Data Analysis (EDA)](#exploratory-data-analysis-eda)
 5. [Results and Recommendations](#results-and-recommendations)
@@ -13,9 +13,13 @@ https://public.tableau.com/app/profile/chung.hsi.shan/vizzes
 ## Introduction
 This repository contains SQL scripts and analysis for Medicare data to explore healthcare provider behavior and trends. The primary objectives include data cleaning, handling missing values, identifying outliers, and performing exploratory data analysis to derive actionable insights.
 
-## Tools Used
+## Tools Used and Dashboard Preview
 - **PostgreSQL**: Used for all data cleaning, transformation and analysis.
-- **Tableau**: Dashboard creation and data visualization. 
+- **Tableau**: Dashboard creation and data visualization.
+- Below are screenshots taken of the Medicare Dashboard created using Tableau:
+![Dashboard 1](https://github.com/user-attachments/assets/15ae6085-f600-411d-86e1-1595e4b22a4e)
+![Dashboard 2](https://github.com/user-attachments/assets/a5ab3ca1-c61a-4471-868f-0287209d61dc)
+
 
 ## Data Cleaning and Preparation
 The data cleaning process involves several steps to ensure the dataset's quality and usability:
@@ -91,7 +95,7 @@ Exploratory Data Analysis aims to summarize the main characteristics of the data
 2. **Service Type Analysis**: the number of services rendered and the corresponding costs incurred on the Medicare program. 
 3. **Ranking Analysis**: Rank healthcare providers based on the total amount claimed.
 
-## Code Snippets
+### Code Snippets
 ```sql
 -- 1. Provider Type Analysis
 
@@ -259,3 +263,24 @@ WHERE
     rndrng_prvdr_type = 'Endocrinology' OR
     rndrng_prvdr_type = 'Pediatric Medicine';
 ```
+## Results and Recommendations
+
+
+## Limitations
+- Only Medicare Part B (Outpatient Services) non-institutional claims (excluding
+DMEPOS) are used for the creation of the dashboard, meaning Part A (Inpatient
+Services), C (Medicare Advantage Plan), and D (Prescription Drug Coverage) part of
+Medicare was not included, thus the analysis can only be generalized to Part B of
+Medicare.
+- The dataset only includes healthcare providers who are not affiliated with an
+institution. 
+- To protect the privacy of Medicare beneficiaries, any aggregated records that are
+derived from 10 or fewer beneficiaries are excluded. Therefore volume HSPCS codes are
+not part of the analysis and the total sum calculated may be a slight underestimation
+of the true Medicare Part B totals. 
+- Private insurance and other insurance claims are not taken into account in the analysis.
+- Some providers bill under both an individual NPI and an organizational 
+NPI. In this case, users cannot determine a provider’s actual total because there is
+no way to identify the individual’s portion when billed under their organization.
+- For the reasons above, the data do not represent a healthcare provider's entire
+practice, and omit providers who are institution-affiliated.
