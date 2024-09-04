@@ -5,13 +5,13 @@
 2. [Tools Used and Dashboard Preview](#tools-used-and-dashboard-preview)
 3. [Data Cleaning and Preparation](#data-cleaning-and-preparation)
 4. [Exploratory Data Analysis (EDA)](#exploratory-data-analysis-eda)
-5. [Results and Recommendations](#results-and-recommendations)
+5. [Results and Next-Steps](#results-and-next-steps)
 6. [Limitations](#limitations)
 
 ## Introduction
 This project is inspired by my experience in rare disease marketing at Sanofi, where navigating the complex diagnostic landscape for rare disease patients posed significant challenges. Organizations often struggle to determine the most effective allocation of resources to promote accurate diagnoses. Understanding healthcare provider distribution and behavior is crucial for optimizing resource allocation, especially in regions with limited patient populations and specialized needs. The goal of this project is to develop a dashboard that provides a data-driven overview of provider activity and influence across various areas and specialties, thereby addressing these challenges.
 
-The analysis utilizes data from the Centers for Medicare & Medicaid Services (CMS), specifically the Provider Utilization and Payment Data Physician and Other Practitioners Dataset. This dataset offers comprehensive details on services and procedures provided to Medicare beneficiaries by physicians and other healthcare professionals. It includes information on utilization, payment, and charges, categorized by National Provider Identifier (NPI), Healthcare Common Procedure Coding System (HCPCS) code, and place of service. The dataset encompasses 100% of final-action Part B non-institutional claims for the Medicare fee-for-service population, excluding those processed by Durable Medical Equipment, Prosthetics, Orthotics, and Supplies (DMEPOS) Medicare Administrative Contractors (MACs). Data sources include CMS administrative claims and the Chronic Condition Data Warehouse (CCW), supplemented by provider demographics from the National Plan & Provider Enumeration System (NPPES).
+The analysis utilizes data from the Centers for Medicare & Medicaid Services (CMS), specifically the Provider Utilization and Payment Data Physician and Other Practitioners Dataset. This dataset offers comprehensive details on services and procedures provided to Medicare beneficiaries by physicians and other healthcare professionals. It includes information on utilization, payment, and charges, categorized by National Provider Identifier (NPI), Healthcare Common Procedure Coding System (HCPCS) code, and place of service. The dataset encompasses 100% of final-action Part B non-institutional claims for the Medicare fee-for-service population, excluding those processed by Durable Medical Equipment, Prosthetics, Orthotics, and Supplies (DMEPOS) Medicare Administrative Contractors (MACs).
 
 This repository contains SQL scripts and analyses of Medicare data to explore provider behavior and trends. Key objectives involve data cleaning, managing missing values, identifying outliers, and conducting exploratory data analysis. The resulting dashboard is designed to be user-friendly, offering insights into healthcare spending across different provider types and individual healthcare professionals. It aims to support decision-makers in making more informed choices regarding resource allocation and strategic planning.
 
@@ -37,6 +37,7 @@ The data cleaning process involves several steps to ensure the dataset's quality
 
 ```sql
 -- 1. Remove duplicates based on the defined unique fields
+
 DELETE FROM public.medicare_data
 WHERE rndrng_npi NOT IN (
     SELECT MIN(rndrng_npi)
@@ -45,6 +46,7 @@ WHERE rndrng_npi NOT IN (
 );
 
 -- 2. Check for missing values
+
 SELECT *
 FROM public.medicare_data
 WHERE rndrng_npi IS NULL 
@@ -64,7 +66,8 @@ WHERE rndrng_npi IS NULL
     OR avg_mdcr_stdzd_amt IS NULL;
 
 
--- 3. Validate data to ensure data fits within constraints 
+-- 3. Validate data to ensure data fits within constraints
+
 SELECT *
 FROM public.medicare_data
 WHERE tot_benes < 0
@@ -80,6 +83,7 @@ SELECT DISTINCT LENGTH(CAST(rndrng_npi AS TEXT)) AS digit_count
 FROM public.medicare_data;
 
 -- 4. Standardizing Data Formats by trimming the white space within the text based fields
+
 UPDATE public.medicare_data
 SET 
     rndrng_prvdr_last_org_name = TRIM(rndrng_prvdr_last_org_name),
@@ -103,7 +107,7 @@ Exploratory Data Analysis aims to summarize the main characteristics of the data
 ```sql
 -- 1. Provider Type Analysis
 
--- Taking a look at the number of distinct provider types, there are 103 distinct provider types
+/* Taking a look at the number of distinct provider types, there are 103 distinct provider types. */
 
 SELECT
     DISTINCT rndrng_prvdr_type
@@ -119,7 +123,8 @@ ORDER BY COUNT (DISTINCT rndrng_npi) DESC;
 
 -- 2. Service Type Analysis
 
--- Calculate how many distinct HSPCS code there are, there are a total of 6326 unique HSPCS code in total. 
+/* Calculate how many distinct HSPCS code there are, there are a total of 6326 unique
+HSPCS code in total. */
 
 SELECT
     COUNT (DISTINCT hcpcs_cd)
@@ -195,7 +200,10 @@ ORDER BY rounded_outlier_percentage DESC;
 
 -- 3. Ranking Analysis
 
--- The following ranks NPIs according to their service type and state, based on the total claim amount for the year 2022. The results generated can be further filtered down to the desired service provider type and their state to identify regional top spenders. 
+/* The following ranks NPIs according to their service type and state, based on the
+total claim amount for the year 2022. The results generated can be further filtered
+down to the desired service provider type and their state to identify regional top
+spenders. */
 
 WITH table_total_amt AS (
     SELECT 
@@ -241,7 +249,9 @@ WHERE rndrng_prvdr_state_abrvtn != 'AA'
     AND rndrng_prvdr_state_abrvtn != 'AE'
 ORDER BY rndrng_prvdr_state_abrvtn, rndrng_prvdr_type, ranking;
 
--- Lastly, the following selects for service provider types that are relevant to the disease area of rare diseases. The table generated is used to create the tableau dashboard.
+/* Lastly, the following selects for service provider types that are relevant to the
+disease area of rare diseases. The table generated is used to create the tableau
+dashboard. */
 
 SELECT 
 	rndrng_npi AS npi,
@@ -267,14 +277,17 @@ WHERE
     rndrng_prvdr_type = 'Endocrinology' OR
     rndrng_prvdr_type = 'Pediatric Medicine';
 ```
-## Results and Recommendations
+## Results and Next-Steps
 ### Results 
-- **Resource Allocation**: By understanding where KOLs are located and how they influence the healthcare landscape, organizations can more effectively allocate resources, target outreach efforts, and design educational programs.
-- **Market Analysis and Strategy**: The insights derived from this data analysis can help inform market strategies, identify unmet needs, and guide product development and distribution plans.
-- **Improving Patient Outcomes**: By identifying trends in healthcare provider behavior, stakeholders can implement strategies to improve patient outcomes, particularly in underserved or high-need areas.
-- **Policy Development**: Policy makers can use the data to understand healthcare utilization patterns and develop policies that address gaps in care or inequities in service provision.
+- **Understanding Diagnostic Patterns and Usage**:
+- **Validate KOL Targets to Support Resource Allocation**: Pharmaceutical organizations often maintain a list of KOLs for commercial/medical engagement, selected based on their expertise, credentials, research output, publications, professional recognition, and influence in their disease area of interest. This dashboard provides a data-driven approach to validate these existing KOLs and identify new or previously unengaged KOLs for potential engagement through the HCP's Medicare prescribing volume and habits. For instance, if a pharmaceutical company aims to expand its commercial efforts into a specific region or state, the dashboard can identify the top healthcare providers with the highest patient volumes within the targeted provider type. It also provides a detailed breakdown of HCPCS code spending and includes relevant contact information. By leveraging this tool, organizations can refine their engagement strategies to collaborate with the most influential and current thought leaders in their fields, thereby strengthening their market presence and strategic impact.
+- **Develop Educational/Diagnostic Programs to Improve Patient Journey and Outcomes**: 
 
-### Recommendations 
+### Next-Steps
+- **Time Series Analysis**:
+- **Expand to part D**: 
+- **Create a dashboard that filters based on the HCPCS code**: 
+- **Include more service provider types**
 
 ## Limitations
 - Only Medicare Part B (Outpatient Services) non-institutional claims (excluding
@@ -292,5 +305,5 @@ of the true Medicare Part B totals.
 - Some providers bill under both an individual NPI and an organizational 
 NPI. In this case, users cannot determine a provider’s actual total because there is
 no way to identify the individual’s portion when billed under their organization.
-- For the reasons above, the data do not represent a healthcare provider's entire
-practice, and omit providers who are institution-affiliated.
+- For the limitations listed above, the data do not represent a healthcare provider's
+entire practice. 
