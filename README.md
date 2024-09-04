@@ -1,7 +1,5 @@
 # Medicare Data Analysis and Dashboard
 
-https://public.tableau.com/app/profile/chung.hsi.shan/vizzes
-
 ## Table of Contents
 1. [Introduction](#introduction)
 2. [Tools Used and Dashboard Preview](#tools-used-and-dashboard-preview)
@@ -12,6 +10,7 @@ https://public.tableau.com/app/profile/chung.hsi.shan/vizzes
 
 ## Introduction
 This repository contains SQL scripts and analysis for Medicare data to explore healthcare provider behavior and trends. The primary objectives include data cleaning, handling missing values, identifying outliers, and performing exploratory data analysis to derive actionable insights.
+**Link to dashboard**: https://public.tableau.com/app/profile/chung.hsi.shan/vizzes
 
 ## Tools Used and Dashboard Preview
 - **PostgreSQL**: Used for all data cleaning, transformation and analysis.
