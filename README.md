@@ -11,6 +11,8 @@
 ## Introduction
 This project is inspired by my experience in rare disease marketing at Sanofi, where navigating the complex diagnostic landscape for rare disease patients posed significant challenges. Organizations often struggle to determine the most effective allocation of resources to promote accurate diagnoses. Understanding how healthcare providers are distributed and how they behave is crucial for optimizing these efforts, especially in rare diseases, where patients often see multiple specialists before receiving a correct diagnosis. This complexity makes it challenging for pharmaceutical companies to identify which specialties to prioritize in their educational programs or efforts to improve diagnostic accuracy and reduce the time to diagnosis. This project aims to create a dashboard that offers a data-driven view of provider activity, highlighting top HCPs with the highest patient volumes. This approach helps organizations identify key targets/regions where educational or awareness initiatives could be most impactful.
 
+![image](https://github.com/user-attachments/assets/1592d77e-c5e2-4136-90bc-3a191aeb536e)
+
 The analysis utilizes data from the Centers for Medicare & Medicaid Services (CMS), specifically the Provider Utilization and Payment Data Physician and Other Practitioners Dataset. This dataset offers comprehensive details on services and procedures provided to Medicare beneficiaries by physicians and other healthcare professionals. It includes information on utilization, payment, and charges, categorized by National Provider Identifier (NPI), Healthcare Common Procedure Coding System (HCPCS) code, and place of service. The dataset encompasses 100% of final-action Part B non-institutional claims for the Medicare fee-for-service population, excluding those processed by Durable Medical Equipment, Prosthetics, Orthotics, and Supplies (DMEPOS) Medicare Administrative Contractors (MACs).
 
 This repository contains SQL scripts and analyses of Medicare data to explore provider behavior and trends. Key objectives involve data cleaning, managing missing values, identifying outliers, and conducting exploratory data analysis. The resulting dashboard is designed to be user-friendly, offering insights into healthcare spending across different provider types and individual healthcare professionals. It aims to support decision-makers in making more informed choices regarding resource allocation and strategic planning.
@@ -20,7 +22,7 @@ This repository contains SQL scripts and analyses of Medicare data to explore pr
 ## Tools Used and Dashboard Preview
 - **PostgreSQL**: Used for all data cleaning, transformation and analysis.
 - **Tableau**: Dashboard creation and data visualization.
-- Below are screenshots taken of the Medicare Dashboard created using Tableau:
+- Below are screenshots taken from the Medicare Dashboard, which is created using Tableau:
 ![Dashboard 1](https://github.com/user-attachments/assets/15ae6085-f600-411d-86e1-1595e4b22a4e)
 ![Dashboard 2](https://github.com/user-attachments/assets/a5ab3ca1-c61a-4471-868f-0287209d61dc)
 
@@ -285,9 +287,8 @@ WHERE
 
 ### Next-Steps
 - **Time Series Analysis**:
-- **Expand to part D**: 
 - **Create a dashboard that filters based on the HCPCS code**: 
-- **Include more service provider types**
+- **Include more service provider types**:
 
 ## Limitations
 - Only Medicare Part B (Outpatient Services) non-institutional claims (excluding
