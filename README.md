@@ -14,7 +14,7 @@ https://public.tableau.com/app/profile/chung.hsi.shan/vizzes
 This repository contains SQL scripts and analysis for Medicare data to explore healthcare provider behavior and trends. The primary objectives include data cleaning, handling missing values, identifying outliers, and performing exploratory data analysis to derive actionable insights.
 
 ## Tools Used
-- **PostgreSQL**: Used for all data handling, cleaning, and analysis.
+- **PostgreSQL**: Used for all data cleaning, transformation and analysis.
 - **Tableau**: Dashboard creation and data visualization. 
 
 ## Data Cleaning and Preparation
@@ -187,7 +187,7 @@ ORDER BY rounded_outlier_percentage DESC;
 
 -- 3. Ranking Analysis
 
--- The following ranks NPIs according to their service type and state, based on the total claim amount for the year 2022.
+-- The following ranks NPIs according to their service type and state, based on the total claim amount for the year 2022. The results generated can be further filtered down to the desired service provider type and their state to identify regional top spenders. 
 
 WITH table_total_amt AS (
     SELECT 
@@ -233,4 +233,29 @@ WHERE rndrng_prvdr_state_abrvtn != 'AA'
     AND rndrng_prvdr_state_abrvtn != 'AE'
 ORDER BY rndrng_prvdr_state_abrvtn, rndrng_prvdr_type, ranking;
 
+-- Lastly, the following selects for service provider types that are relevant to the disease area of rare diseases. The table generated is used to create the tableau dashboard.
+
+SELECT 
+	rndrng_npi AS npi,
+	rndrng_prvdr_last_org_name ||' '|| rndrng_prvdr_first_name AS full_name,
+	CASE 
+		WHEN rndrng_prvdr_st2 = '' THEN rndrng_prvdr_st1
+		ELSE rndrng_prvdr_st1||', '|| rndrng_prvdr_st2 
+	END AS full_address,
+	rndrng_prvdr_city AS city,
+	rndrng_prvdr_state_abrvtn AS state_abbreviation,
+	rndrng_prvdr_type AS provider_type,
+	hcpcs_cd AS hcpcs_code,
+	hcpcs_desc AS hcpcs_description, 
+	tot_benes AS num_medicare_patients,
+	tot_srvcs AS total_serviced,
+	tot_srvcs * avg_sbmtd_chrg AS total_cost
+FROM public.medicare_data
+WHERE 
+    rndrng_prvdr_type = 'Medical Genetics and Genomics' OR
+    rndrng_prvdr_type = 'Neurology' OR
+    rndrng_prvdr_type = 'Hematology' OR
+    rndrng_prvdr_type = 'Rheumatology' OR
+    rndrng_prvdr_type = 'Endocrinology' OR
+    rndrng_prvdr_type = 'Pediatric Medicine';
 ```
