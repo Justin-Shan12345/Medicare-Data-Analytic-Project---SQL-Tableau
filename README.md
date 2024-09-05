@@ -101,7 +101,6 @@ SET
 
 
 ## Exploratory Data Analysis (EDA)
-Exploratory Data Analysis aims to summarize the main characteristics of the dataset using statistical graphics and other data visualization methods:
 
 1. **Provider Type Analysis**: Understand the distribution of various provider types in the Medicare data.
 2. **Service Type Analysis**: the number of services rendered and the corresponding costs incurred on the Medicare program. 
