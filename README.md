@@ -281,14 +281,16 @@ WHERE
 ```
 ## Results and Next-Steps
 ### Results 
-- **Understanding Diagnostic Patterns and Usage**:
 - **Validate KOL Targets to Support Resource Allocation**: Pharmaceutical organizations often maintain a list of KOLs for commercial/medical engagement, selected based on their expertise, credentials, research output, publications, professional recognition, and influence in their disease area of interest. This dashboard provides a data-driven approach to validate these existing KOLs and identify new or previously unengaged KOLs for potential engagement through the HCP's Medicare prescribing volume and habits. For instance, if a pharmaceutical company aims to expand its commercial efforts into a specific region or state, the dashboard can identify the top healthcare providers with the highest patient volumes within the targeted provider type. It also provides a detailed breakdown of HCPCS code spending and includes relevant contact information. By leveraging this tool, organizations can refine their engagement strategies to collaborate with the most influential and current thought leaders in their fields, thereby strengthening their market presence and strategic impact.
-- **Develop Educational/Diagnostic Programs to Improve Patient Journey and Outcomes**: 
 
 ### Next-Steps
-- **Time Series Analysis**:
-- **Create a dashboard that filters based on the HCPCS code**: 
-- **Include more service provider types**:
+- **Time Series Analysis**: Medicare publishes data from 2013 to 2022 and updates this database annually.
+	- Monitor Change in Practice: By joining all the data together, a time series analysis can be conducted to examine HCP practice trends, allowing for a better understanding of whether each HCP is expanding or shrinking its practice over time.
+	- Identifying Service Utilization Patterns: Time series analysis can show which services are increasing in use and which are declining. This is crucial for understanding shifts in medical practice, such as the adoption of new treatments, technologies, or diagnostic procedures.
+	- Assessing Regional Variations in Healthcare Delivery: By breaking down HCPCS code usage by region, organizations can identify geographic differences in service delivery. For instance, certain procedures or treatments may be more commonly used in one region than another, reflecting regional preferences, availability of specialists, or demographic needs.
+
+- **Reverse search through HCPCS code**: The dashboard could be enhanced by enabling users to filter top HCPs based on specific HCPCS codes of interest. For instance, a company that has developed treatments for Spinal Muscular Atrophy (SMA), a rare genetic disorder, might focus on HCPCS code 81401, which pertains to the genetic testing procedure used to identify SMA mutations. Organizations can use this tool to narrow down a list of top prescribing HCPs to focus their commercial/medical efforts. 
+
 
 ## Limitations
 - Only Medicare Part B (Outpatient Services) non-institutional claims (excluding
