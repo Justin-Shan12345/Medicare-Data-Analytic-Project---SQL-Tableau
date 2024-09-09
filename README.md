@@ -303,7 +303,8 @@ institution.
 - To protect the privacy of Medicare beneficiaries, any aggregated records that are
 derived from 10 or fewer beneficiaries are excluded. Therefore volume HSPCS codes are
 not part of the analysis and the total sum calculated may be a slight underestimation
-of the true Medicare Part B totals. 
+of the true Medicare Part B totals.
+- Due to the dataset size limit on Tableau Public, only the following provider specialties are selected (Rheumatology, Neurology, Endocrinology, Hematology, Pediatric Medicine, Medical Genetics and Genomics)
 - Private insurance and other insurance claims are not taken into account in the analysis.
 - Some providers bill under both an individual NPI and an organizational 
 NPI. In this case, users cannot determine a provider’s actual total because there is
